@@ -221,7 +221,10 @@ gulp.task('watch', function () {
     gulp.watch(JS_DIR, ['javascript']);
 
     // Reload
-    var reloadDirs = JS_DIR.concat(HTML_DIR);
+    var reloadDirs = HTML_DIR
+        .concat([
+            SRC_DIR + '/carbo-inquirer.bundle.js'
+        ]);
     gulp.watch(reloadDirs, browserSync.reload);
 });
 

@@ -15,76 +15,76 @@
   <link rel="import" type="css" href="../paper-dialog-behavior/paper-dialog-common.css">
 
   <template>
-    <div id="dialog">
+    <iron-pages
+      attr-for-selected="question-index"
+      selected="{{ currentQuestionIndex }}">
 
-      <iron-pages
-        attr-for-selected="question-index"
-        selected="{{ currentQuestionIndex }}">
+      <template
+        is="dom-repeat"
+        items="{{ questions }}"
+        as="question">
 
-        <template
-          is="dom-repeat"
-          items="{{ questions }}"
-          as="question">
+        <!-- question start -->
+        <div
+          class="question"
+          question-index$="{{ index }}">
+          <h2>{{ index }}</h2>
+          <h1>{{ question.message }}</h1>
 
-          <!-- question start -->
-          <div
-            class="question"
-            question-index$="{{ index }}">
-            <h2>{{ index }}</h2>
-            <h1>{{ question.message }}</h1>
+          <!-- question inputs -->
+          <!-- simple input -->
+          <carbo-inquirer-input
+            hidden$="[[ isQuestionNotOfType(question, 'input') ]]"
+            question="{{ question }}"
+            navigator="{{ navigator }}">
+          </carbo-inquirer-input>
 
-            <!-- question inputs -->
-            <!-- simple input -->
-            <carbo-inquirer-input
-              hidden$="[[ isQuestionNotOfType(question, 'input') ]]"
-              question="{{ question }}">
-            </carbo-inquirer-input>
+          <!-- list -->
+          <carbo-inquirer-list
+            hidden$="[[ isQuestionNotOfType(question, 'list') ]]"
+            question="{{ question }}"
+            navigator="{{ navigator }}">
+          </carbo-inquirer-list>
 
-            <!-- list -->
-            <carbo-inquirer-list
-              hidden$="[[ isQuestionNotOfType(question, 'list') ]]"
-              question="{{ question }}">
-            </carbo-inquirer-list>
+          <!-- password -->
+          <carbo-inquirer-password
+            hidden$="[[ isQuestionNotOfType(question, 'password') ]]"
+            question="{{ question }}"
+            navigator="{{ navigator }}">
+          </carbo-inquirer-password>
+          <!-- question inputs -->
 
-            <!-- password -->
-            <carbo-inquirer-password
-              hidden$="[[ isQuestionNotOfType(question, 'password') ]]"
-              question="{{ question }}">
-            </carbo-inquirer-password>
-            <!-- question inputs -->
+          <!-- to previous question -->
+          <button
+            hidden$="{{ isAtFirstQuestion }}"
+            on-tap="previousQuestion">
+            previous
+          </button>
 
-            <!-- to previous question -->
-            <button
-              hidden$="{{ isAtFirstQuestion }}"
-              on-tap="previousQuestion">
-              previous
-            </button>
+          <!-- to next question -->
+          <button
+            hidden$="{{ isAtLastQuestion }}"
+            on-tap="nextQuestion">
+            next
+          </button>
 
-            <!-- to next question -->
-            <button
-              hidden$="{{ isAtLastQuestion }}"
-              on-tap="nextQuestion">
-              next
-            </button>
+          <!-- submit answers -->
+          <button
+            hidden$="{{ !isAtLastQuestion }}"
+            on-tap="submit">
+            submit
+          </button>
 
-            <!-- submit answers -->
-            <button
-              hidden$="{{ !isAtLastQuestion }}"
-              on-tap="submit">
-              submit
-            </button>
+          <button
+            on-tap="cancel">
+            cancel
+          </button>
+        </div>
+        <!-- question end -->
 
-            <button
-              on-tap="cancel">
-              cancel
-            </button>
-          </div>
-          <!-- question end -->
+      </template>
 
-        </template>
-
-      </iron-pages>
-    </div>
+    </iron-pages>
   </template>
 
   <script src="../q/q.js"></script>

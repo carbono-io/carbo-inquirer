@@ -19,7 +19,10 @@ var NavigationBehavior = require('./scripts/behaviors/navigation');
 var InquirerComponent = Polymer({
     is: 'carbo-inquirer',
 
-    behaviors: [Polymer.PaperDialogBehavior],
+    behaviors: [
+        Polymer.PaperDialogBehavior,
+        NavigationBehavior
+    ],
 
     properties: {
         /**
@@ -36,7 +39,7 @@ var InquirerComponent = Polymer({
     },
 
     listeners: {
-        'dialog.iron-overlay-closed': '_handleDialogClosed',
+        'iron-overlay-closed': '_handleOverlayClosed',
     },
 
     /**
@@ -85,10 +88,10 @@ var InquirerComponent = Polymer({
      * Resets the inquirer
      */
     reset: function () {
-
-        alert('reset')
         // delete the defer
         delete this.defer;
+
+        console.log('reset');
 
         // reset answers
         var questions = this.get('questions');
@@ -110,9 +113,6 @@ var InquirerComponent = Polymer({
             this.defer.resolve(answers);
         }
 
-        // reset
-        this.reset();
-
         // close modal, from PaperDialogBehavior
         this.close();
     },
@@ -120,19 +120,17 @@ var InquirerComponent = Polymer({
     /**
      * Cancels the inquirer
      */
-    _handleDialogClosed: function (event) {
+    // cancel: function () {
+    //     if (this.defer) {
+    //         this.defer.reject();
+    //     }
 
-        alert('ajskdjasd')
-        if (this.defer) {
-            this.defer.reject();
-        }
+    //     // reset
+    //     this.reset();
 
-        // // reset
-        // this.reset();
-
-        // // close modal, from PaperDialogBehavior
-        // this.close();
-    },
+    //     // close modal, from PaperDialogBehavior
+    //     Polymer.PaperDialogBehavior.cancel.call(this);
+    // },
 
     // Auxiliary functions
     /**
@@ -151,7 +149,22 @@ var InquirerComponent = Polymer({
      */
     _handleQuestionsChange: function (questions, oldQuestions) {
 
-    },});
+    },
+
+    /**
+     * Deals with the close event of the dialog.
+     * If it was canceled, reject the deferred object
+     */
+    _handleOverlayClosed: function (event) {
+        // this.canceled is from PaperDialogBehavior
+        if (this.canceled && this.defer) {
+            this.defer.reject();
+        }
+
+        // reset after everything is done
+        this.reset();
+    },
+});
 
 // define some properties
 Object.defineProperty(InquirerComponent.prototype, 'answers', {

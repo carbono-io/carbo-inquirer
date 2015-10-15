@@ -39,6 +39,16 @@ exports.properties = {
     }
 };
 
+exports.ready = function () {
+
+    console.log('qwejqwkjehqwke');
+    // Auxiliary object for navigation within fields
+    this.navigator = {
+        previousQuestion: this.previousQuestion.bind(this),
+        nextQuestion: this.nextQuestion.bind(this)
+    };
+};
+
 /**
  * Question navigation
  */
@@ -67,11 +77,19 @@ exports.nextQuestion = function () {
  * Whenever the currentQuestionIndex changes, we must notify the people.
  */
 exports._handleCurrentQuestionIndexChange = function (currentQuestionIndex, lastQuestionIndex) {
-    var current = this.get('currentQuestionIndex');
-    // check if the current question is the first one
-    var isFirst = current === 0;
-    // check if the current question is the first one
-    var isLast  = (current === this.questions.length - 1);
+
+    var isFirst = true;
+    var isLast  = false;
+
+    if (this.questions) {
+
+
+        var current = this.get('currentQuestionIndex');
+        // check if the current question is the first one
+        isFirst = current === 0;
+        // check if the current question is the first one
+        isLast  = (current === this.questions.length - 1);
+    }
 
     this.set('isAtFirstQuestion', isFirst);
     this.set('isAtLastQuestion', isLast);

@@ -72,7 +72,7 @@
         id="t"
         is="dom-bind">
 
-        <button id="ask" on-tap="inquire">ask!</button>
+        <button autofocus id="ask" on-tap="inquire">ask!</button>
 
         <!-- inquirer element -->
         <carbo-inquirer
@@ -154,17 +154,23 @@
 
             // get elements
             var t = document.getElementById('t');
+            var ask = document.getElementById('ask');
             var inquirer = document.getElementById('inquirer');
             var answersEl = document.getElementById('answers');
 
             // set values onto scope
             t.set('questions', set1);
             t.inquire = function () {
-                inquirer.prompt()
+                inquirer
+                    .prompt()
                     .then(function (answers) {
                         answersEl.innerHTML = JSON.stringify(answers, null, '\t');
+
+                        ask.focus()
                     }, function () {
-                        answersEl.innerHTML = 'cancelled :('
+                        answersEl.innerHTML = 'cancelled :(';
+
+                        ask.focus()
                     });
             };
 

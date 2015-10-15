@@ -9,8 +9,21 @@
             question: {
                 type: Object,
                 notify: true,
-            }
+            },
+
+            navigator: {
+                type: Object,
+                notify: true
+            },
         },
+
+        nextQuestion: function () {
+            this.navigator.nextQuestion();
+        },
+
+        previousQuestion: function () {
+            this.navigator.previousQuestion();
+        }
     };
 
 </script>
