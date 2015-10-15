@@ -10,6 +10,17 @@
     <link rel="import" href="../src/carbo-inquirer.html">
 
     <style type="text/css">
+        #ask {
+            position: fixed;
+
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            background-color: navy;
+            color: white;
+        }
+
         #inquirer {
             position: fixed;
 
@@ -25,6 +36,34 @@
 
             background-color: skyblue;
         }
+
+        #dev {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            padding-left: 50px;
+            padding-right: 50px;
+            padding-bottom: 50px;
+
+            background-color: darkred;
+            color: white;
+        }
+
+        #dev > section {
+            float: left;
+            width: 50%;
+        }
+
+        #dev table {
+            color: white;
+            border: 1px solid magenta;
+        }
+
+        #dev table td {
+            border: 1px solid magenta;
+        }
     </style>
 </head>
 <body>
@@ -33,9 +72,17 @@
         id="t"
         is="dom-bind">
 
-        <!-- for development use only -->
+        <button id="ask" on-tap="inquire">ask!</button>
+
+        <!-- inquirer element -->
+        <carbo-inquirer
+            id="inquirer"
+            questions="{{ questions }}">
+        </carbo-inquirer>
+
         <div id="dev">
-          <div id="answers">
+          <section>
+            <h3>questions</h3>
             <table>
               <tr>
                 <th>question</th>
@@ -51,36 +98,20 @@
                 </tr>
               </template>
             </table>
-          </div>
+          </section>
+          <section>
+            <h3>answers</h3>
+            <pre id="answers">
+
+            </pre>
+          </section>
         </div>
-        <!-- for development use only -->
-
-        <carbo-inquirer
-            id="inquirer"
-            current-question-index="0"
-            questions="{{ questions }}">
-            
-        </carbo-inquirer>
-
     </template>
 
     <script>
 
-        /**
-        FROM: inquirer (node module)
-
-        type: (String) Type of the prompt. Defaults: input - Possible values: input, confirm, list, rawlist, password
-        name: (String) The name to use when storing the answer in the answers hash.
-        message: (String|Function) The question to print. If defined as a function, the first parameter will be the current inquirer session answers.
-        default: (String|Number|Array|Function) Default value(s) to use if nothing is entered, or a function that returns the default value(s). If defined as a function, the first parameter will be the current inquirer session answers.
-        choices: (Array|Function) Choices array or a function returning a choices array. If defined as a function, the first parameter will be the current inquirer session answers.
-        Array values can be simple strings, or objects containing a name (to display) and a value properties (to save in the answers hash). Values can also be a Separator.
-        validate: (Function) Receive the user input and should return true if the value is valid, and an error message (String) otherwise. If false is returned, a default error message is provided.
-        filter: (Function) Receive the user input and return the filtered value to be used inside the program. The value returned will be added to the Answers hash.
-        when: (Function, Boolean) Receive the current user answers hash and should return true or false depending on whether or not this question should be asked. The value can also be a simple boolean.
-         */
-
         var set1 = [];
+
         set1.push({
             type: 'input',  // input, confirm, list, rawlist, password
             name: 'name',
@@ -88,12 +119,14 @@
             message: 'Qual o seu nome?',
             default: 'Jerry',
         });
+
         set1.push({
             type: 'list',
             name: 'favouriteChocolate',
             label: 'chocolate',
             message: 'Qual o seu chocolate preferido?',
             default: 'kinder',
+            // choices currently not compatible with inquirer...
             choices: [
                 {
                     label: 'Ferrero',
@@ -109,6 +142,7 @@
                 }
             ],
         });
+
         set1.push({
             type: 'password',
             name: 'password',
@@ -118,11 +152,23 @@
 
         window.addEventListener('WebComponentsReady', function () {
 
+            // get elements
             var t = document.getElementById('t');
-            t.set('questions', set1);
-
             var inquirer = document.getElementById('inquirer');
+            var answersEl = document.getElementById('answers');
 
+            // set values onto scope
+            t.set('questions', set1);
+            t.inquire = function () {
+                inquirer.prompt()
+                    .then(function (answers) {
+                        answersEl.innerHTML = JSON.stringify(answers, null, '\t');
+                    }, function () {
+                        answersEl.innerHTML = 'cancelled :('
+                    });
+            };
+
+            // Expose
             window.t = t;
             window.inquirer = inquirer;
         });

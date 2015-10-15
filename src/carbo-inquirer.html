@@ -1,78 +1,89 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../paper-dialog-behavior/paper-dialog-behavior.html">
 
 <!-- question-elements -->
-<link rel="import" href="carbo-inquirer-input.html">
-<link rel="import" href="carbo-inquirer-list.html">
-<link rel="import" href="carbo-inquirer-password.html">
+<link rel="import" href="fields/input.html">
+<link rel="import" href="fields/list.html">
+<link rel="import" href="fields/password.html">
 
 <link href="carbo-inquirer-styles.html" rel="import">
 
 <dom-module id="carbo-inquirer">
   <style include="carbo-inquirer-styles"></style>
 
+  <link rel="import" type="css" href="../paper-dialog-behavior/paper-dialog-common.css">
+
   <template>
-    <div id="wrapper">
+    <div id="dialog">
 
-    <iron-pages
-      attr-for-selected="question-index"
-      selected="{{ currentQuestionIndex }}">
+      <iron-pages
+        attr-for-selected="question-index"
+        selected="{{ currentQuestionIndex }}">
 
-      <template
-      is="dom-repeat"
-      items="{{ questions }}"
-      as="question">
+        <template
+          is="dom-repeat"
+          items="{{ questions }}"
+          as="question">
 
-      <!-- question start -->
-      <div
-        class="question"
-        question-index$="{{ index }}">
-        <h2>{{ index }}</h2>
-        <h1>{{ question.message }}</h1>
+          <!-- question start -->
+          <div
+            class="question"
+            question-index$="{{ index }}">
+            <h2>{{ index }}</h2>
+            <h1>{{ question.message }}</h1>
 
-        <!-- question inputs -->
-        <!-- simple input -->
-        <carbo-inquirer-input
-          hidden$="[[ isQuestionNotOfType(question, 'input') ]]"
-          question="{{ question }}">
-        </carbo-inquirer-input>
+            <!-- question inputs -->
+            <!-- simple input -->
+            <carbo-inquirer-input
+              hidden$="[[ isQuestionNotOfType(question, 'input') ]]"
+              question="{{ question }}">
+            </carbo-inquirer-input>
 
-        <!-- list -->
-        <carbo-inquirer-list
-          hidden$="[[ isQuestionNotOfType(question, 'list') ]]"
-          question="{{ question }}">
-        </carbo-inquirer-list>
+            <!-- list -->
+            <carbo-inquirer-list
+              hidden$="[[ isQuestionNotOfType(question, 'list') ]]"
+              question="{{ question }}">
+            </carbo-inquirer-list>
 
-        <!-- password -->
-        <carbo-inquirer-password
-          hidden$="[[ isQuestionNotOfType(question, 'password') ]]"
-          question="{{ question }}">
-        </carbo-inquirer-password>
-        <!-- question inputs -->
+            <!-- password -->
+            <carbo-inquirer-password
+              hidden$="[[ isQuestionNotOfType(question, 'password') ]]"
+              question="{{ question }}">
+            </carbo-inquirer-password>
+            <!-- question inputs -->
 
-        <button
-          hidden$="{{ isAtFirstQuestion }}"
-          on-tap="gotoPreviousQuestion">
-          previous
-        </button>
+            <!-- to previous question -->
+            <button
+              hidden$="{{ isAtFirstQuestion }}"
+              on-tap="previousQuestion">
+              previous
+            </button>
 
-        <button
-          hidden$="{{ isAtLastQuestion }}"
-          on-tap="gotoNextQuestion">
-          next
-        </button>
+            <!-- to next question -->
+            <button
+              hidden$="{{ isAtLastQuestion }}"
+              on-tap="nextQuestion">
+              next
+            </button>
 
-        <button
-        hidden$="{{ !isAtLastQuestion }}"
-        on-tap="submit">
-        submit
-        </button>
-      </div>
-      <!-- question end -->
+            <!-- submit answers -->
+            <button
+              hidden$="{{ !isAtLastQuestion }}"
+              on-tap="submit">
+              submit
+            </button>
 
-      </template>
+            <button
+              on-tap="cancel">
+              cancel
+            </button>
+          </div>
+          <!-- question end -->
 
-    </iron-pages>
+        </template>
+
+      </iron-pages>
     </div>
   </template>
 

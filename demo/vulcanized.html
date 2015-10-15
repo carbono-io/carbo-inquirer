@@ -9,123 +9,169 @@
     <script src="../webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="../carbo-inquirer.html">
 
-        <style type="text/css">
-            #inquirer {
-                position: fixed;
+    <style type="text/css">
+        #ask {
+            position: fixed;
 
-                top: 50%;
-                left: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            background-color: navy;
+            color: white;
+        }
+
+        #inquirer {
+            position: fixed;
+
+            top: 50%;
+            left: 50%;
 
 
-                height: 400px;
-                width: 400px;
+            height: 400px;
+            width: 400px;
 
-                z-index: 5000000;
-                transform: translate(-50%, -50%);
+            z-index: 5000000;
+            transform: translate(-50%, -50%);
 
-                background-color: skyblue;
-            }
-        </style>
-    </head>
-    <body>
+            background-color: skyblue;
+        }
 
-        <template
-            id="t"
-            is="dom-bind">
+        #dev {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
 
-            <!-- for development use only -->
-            <div id="dev">
-              <div id="answers">
-                <table>
-                  <tr>
-                    <th>question</th>
-                    <th>answer</th>
-                  </tr>
-                  <template
-                    is="dom-repeat"
-                    items="{{ questions }}"
-                    as="question">
-                    <tr>
-                      <td>{{ question.name }}</td>
-                      <td>{{ question.answer }}</td>
-                    </tr>
-                  </template>
-                </table>
-              </div>
-            </div>
-            <!-- for development use only -->
+            padding-left: 50px;
+            padding-right: 50px;
+            padding-bottom: 50px;
 
-            <carbo-inquirer
-                id="inquirer"
-                current-question-index="0"
-                questions="{{ questions }}">
-                
-            </carbo-inquirer>
+            background-color: darkred;
+            color: white;
+        }
 
-        </template>
+        #dev > section {
+            float: left;
+            width: 50%;
+        }
 
-        <script>
+        #dev table {
+            color: white;
+            border: 1px solid magenta;
+        }
 
-            /**
-            FROM: inquirer (node module)
+        #dev table td {
+            border: 1px solid magenta;
+        }
+    </style>
+</head>
+<body>
 
-            type: (String) Type of the prompt. Defaults: input - Possible values: input, confirm, list, rawlist, password
-            name: (String) The name to use when storing the answer in the answers hash.
-            message: (String|Function) The question to print. If defined as a function, the first parameter will be the current inquirer session answers.
-            default: (String|Number|Array|Function) Default value(s) to use if nothing is entered, or a function that returns the default value(s). If defined as a function, the first parameter will be the current inquirer session answers.
-            choices: (Array|Function) Choices array or a function returning a choices array. If defined as a function, the first parameter will be the current inquirer session answers.
-            Array values can be simple strings, or objects containing a name (to display) and a value properties (to save in the answers hash). Values can also be a Separator.
-            validate: (Function) Receive the user input and should return true if the value is valid, and an error message (String) otherwise. If false is returned, a default error message is provided.
-            filter: (Function) Receive the user input and return the filtered value to be used inside the program. The value returned will be added to the Answers hash.
-            when: (Function, Boolean) Receive the current user answers hash and should return true or false depending on whether or not this question should be asked. The value can also be a simple boolean.
-             */
+    <template
+        id="t"
+        is="dom-bind">
 
-            var set1 = [];
-            set1.push({
-                type: 'input',  // input, confirm, list, rawlist, password
-                name: 'name',
-                label: 'name',
-                message: 'Qual o seu nome?',
-                default: 'Jerry',
-            });
-            set1.push({
-                type: 'list',
-                name: 'favouriteChocolate',
-                label: 'chocolate',
-                message: 'Qual o seu chocolate preferido?',
-                default: 'kinder',
-                choices: [
-                    {
-                        label: 'Ferrero',
-                        value: 'ferrero',
-                    },
-                    {
-                        label: 'Kinder Chcolate',
-                        value: 'kinder',
-                    },
-                    {
-                        label: 'Nao é shocolate',
-                        value: 'banana',
-                    }
-                ],
-            });
-            set1.push({
-                type: 'password',
-                name: 'password',
-                label: 'password',
-                message: 'Qual a senha da sua conta bancária?'
-            });
+        <button id="ask" on-tap="inquire">ask!</button>
 
-            window.addEventListener('WebComponentsReady', function () {
+        <!-- inquirer element -->
+        <carbo-inquirer
+            id="inquirer"
+            questions="{{ questions }}">
+        </carbo-inquirer>
 
-                var t = document.getElementById('t');
-                t.set('questions', set1);
+        <div id="dev">
+          <section>
+            <h3>questions</h3>
+            <table>
+              <tr>
+                <th>question</th>
+                <th>answer</th>
+              </tr>
+              <template
+                is="dom-repeat"
+                items="{{ questions }}"
+                as="question">
+                <tr>
+                  <td>{{ question.name }}</td>
+                  <td>{{ question.answer }}</td>
+                </tr>
+              </template>
+            </table>
+          </section>
+          <section>
+            <h3>answers</h3>
+            <pre id="answers">
 
-                var inquirer = document.getElementById('inquirer');
+            </pre>
+          </section>
+        </div>
+    </template>
 
-                window.t = t;
-                window.inquirer = inquirer;
-            });
-        </script>
-    </body>
-    </html>
+    <script>
+
+        var set1 = [];
+
+        set1.push({
+            type: 'input',  // input, confirm, list, rawlist, password
+            name: 'name',
+            label: 'name',
+            message: 'Qual o seu nome?',
+            default: 'Jerry',
+        });
+
+        set1.push({
+            type: 'list',
+            name: 'favouriteChocolate',
+            label: 'chocolate',
+            message: 'Qual o seu chocolate preferido?',
+            default: 'kinder',
+            // choices currently not compatible with inquirer...
+            choices: [
+                {
+                    label: 'Ferrero',
+                    value: 'ferrero',
+                },
+                {
+                    label: 'Kinder Chcolate',
+                    value: 'kinder',
+                },
+                {
+                    label: 'Nao é shocolate',
+                    value: 'banana',
+                }
+            ],
+        });
+
+        set1.push({
+            type: 'password',
+            name: 'password',
+            label: 'password',
+            message: 'Qual a senha da sua conta bancária?'
+        });
+
+        window.addEventListener('WebComponentsReady', function () {
+
+            // get elements
+            var t = document.getElementById('t');
+            var inquirer = document.getElementById('inquirer');
+            var answersEl = document.getElementById('answers');
+
+            // set values onto scope
+            t.set('questions', set1);
+            t.inquire = function () {
+                inquirer.prompt()
+                    .then(function (answers) {
+                        answersEl.innerHTML = JSON.stringify(answers, null, '\t');
+                    }, function () {
+                        answersEl.innerHTML = 'cancelled :('
+                    });
+            };
+
+            // Expose
+            window.t = t;
+            window.inquirer = inquirer;
+        });
+    </script>
+</body>
+</html>

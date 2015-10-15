@@ -51,9 +51,11 @@ gulp.task('clean', function clean() {
  */
 gulp.task('build-env', ['less'], function tmp() {
 
-    var copySRC = gulp.src(SRC_DIR + '/*')
+    var copySRC = gulp.src(SRC_DIR + '/**/*')
         .pipe($.rename(function (p) {
-            p.dirname = BOWER.name;
+
+            var baseDirName = path.basename(p.dirname);
+            p.dirname = path.join(BOWER.name, baseDirName);
         }))
         .pipe(gulp.dest(TMP_DIR));
 

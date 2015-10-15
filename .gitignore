@@ -6,3 +6,6 @@ src/**/*-styles.html
 
 # Temporary files used for vulcanization
 tmp
+
+#OSX
+.DS_Store

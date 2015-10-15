@@ -9,8 +9,16 @@
 
     // Globals: Q
     
+    /**
+     * The format of a 'question' object is as follows:
+     * - name
+     * - answer
+     */
+
     Polymer({
         is: 'carbo-inquirer',
+
+        behaviors: [Polymer.PaperDialogBehavior],
 
         properties: {
             /**
@@ -65,40 +73,62 @@
 
             var defer = Q.defer();
 
+            // open modal, from PaperDialogBehavior
+            this.open();
+
             // save reference to the defer object
             this.defer = defer;
 
             // set questions
-            this.set('questions', questions);
+            if (questions) {
+                this.set('questions', questions);
+            }
 
             // return promise
             return defer.promise;
         },
 
+        /**
+         * Reads the answers
+         * @return {Object} Object keyed by 'question.name' and valued by 'question.answer'
+         */
         readAnswers: function () {
             var questions = this.get('questions');
             return questions.reduce(function (answers, question) {
-                answers[question.name] = question.value;
+                answers[question.name] = question.answer;
 
                 return answers;
             }, {});
         },
 
+        /**
+         * Reads the answers and submits results
+         */
         submit: function () {
+            // solve the deferred object
+            if (this.defer) {
+                var answers = this.readAnswers();
+                this.defer.resolve(answers);
+            }
 
-            var answers = this.readAnswers();
+            this.close();
+        },
 
-            console.log(answers);
+        /**
+         * Cancels the inquirer
+         */
+        cancel: function () {
+            if (this.defer) {
+                this.defer.reject();
+            }
+
+            this.close();
         },
 
         /**
          * Question navigation
          */
-        gotoQuestion: function (qIndex) {
-            this.set('currentQuestionIndex', qIndex);
-        },
-
-        gotoPreviousQuestion: function () {
+        previousQuestion: function () {
 
             if (this.get('isAtFirstQuestion')) {
                 alert('you are just starting, c\'mon!');
@@ -109,7 +139,7 @@
 
         },
 
-        gotoNextQuestion: function () {
+        nextQuestion: function () {
 
             if (this.get('isAtLastQuestion')) {
                 alert('you have completed the stuff');

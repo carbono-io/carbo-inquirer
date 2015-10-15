@@ -1,0 +1,16 @@
+<script>
+    // https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
+    // singleton
+    window.CarboInquirer = window.CarboInquirer || {};
+
+    CarboInquirer.FieldBehavior = {
+
+        properties: {
+            question: {
+                type: Object,
+                notify: true,
+            }
+        },
+    };
+
+</script>
