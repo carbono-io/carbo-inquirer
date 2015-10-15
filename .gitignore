@@ -4,6 +4,9 @@ node_modules
 # Generated style-modules
 src/**/*-styles.html
 
+# Generated bundle javascript files
+src/**/*.bundle.js
+
 # Temporary files used for vulcanization
 tmp
 

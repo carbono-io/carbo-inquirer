@@ -15,6 +15,10 @@ var polyclean   = require('polyclean');
 var lazypipe    = require('lazypipe');
 var runSequence = require('run-sequence');
 
+// External dependnecies (browserify stuff)
+var browserify  = require('browserify');
+var vinylSource = require('vinyl-source-stream');
+
 // Load all installed gulp plugins into $
 var $           = require('gulp-load-plugins')();
 
@@ -49,7 +53,7 @@ gulp.task('clean', function clean() {
  * stylesheets must be compiled before being copied
  * to vulcanization area.
  */
-gulp.task('build-env', ['less'], function tmp() {
+gulp.task('build-env', ['less', 'javascript'], function tmp() {
 
     var copySRC = gulp.src(SRC_DIR + '/**/*')
         .pipe($.rename(function (p) {
@@ -63,7 +67,7 @@ gulp.task('build-env', ['less'], function tmp() {
         .pipe(gulp.dest(TMP_DIR));
 
     return mergeStream(copySRC, copyBOWER);
-})
+});
 
 /////////////////////
 // auxiliary tasks //
@@ -120,7 +124,24 @@ gulp.task('less', function less() {
         // Put files at source dir in order to use them for vulcanization
         .pipe(gulp.dest(SRC_DIR))
         .pipe($.size({ title: 'less' }));
-})
+});
+
+
+/**
+ * 
+ */
+gulp.task('javascript', function () {
+    // set up the browserify instance on a task basis
+    var b = browserify({
+        entries: SRC_DIR + '/carbo-inquirer.js',
+        debug: false
+    });
+
+    return b.bundle()
+        .on('error', $.util.log)
+        .pipe(vinylSource('carbo-inquirer.bundle.js'))
+        .pipe(gulp.dest(SRC_DIR));
+});
 
 
 // Build process for post-vulcanized stuff
@@ -195,6 +216,9 @@ gulp.task('watch', function () {
 
     // Watch files for changes
     gulp.watch(LESS_DIR, ['less']);
+
+    // Watch JS files
+    gulp.watch(JS_DIR, ['javascript']);
 
     // Reload
     var reloadDirs = JS_DIR.concat(HTML_DIR);
