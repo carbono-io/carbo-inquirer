@@ -1,0 +1,131 @@
+<html>
+<head>
+    <title></title>
+
+    <script>
+        window.Polymer = window.Polymer || {};
+        window.Polymer.dom = 'shadow';
+    </script>
+    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../carbo-inquirer.html">
+
+        <style type="text/css">
+            #inquirer {
+                position: fixed;
+
+                top: 50%;
+                left: 50%;
+
+
+                height: 400px;
+                width: 400px;
+
+                z-index: 5000000;
+                transform: translate(-50%, -50%);
+
+                background-color: skyblue;
+            }
+        </style>
+    </head>
+    <body>
+
+        <template
+            id="t"
+            is="dom-bind">
+
+            <!-- for development use only -->
+            <div id="dev">
+              <div id="answers">
+                <table>
+                  <tr>
+                    <th>question</th>
+                    <th>answer</th>
+                  </tr>
+                  <template
+                    is="dom-repeat"
+                    items="{{ questions }}"
+                    as="question">
+                    <tr>
+                      <td>{{ question.name }}</td>
+                      <td>{{ question.answer }}</td>
+                    </tr>
+                  </template>
+                </table>
+              </div>
+            </div>
+            <!-- for development use only -->
+
+            <carbo-inquirer
+                id="inquirer"
+                current-question-index="0"
+                questions="{{ questions }}">
+                
+            </carbo-inquirer>
+
+        </template>
+
+        <script>
+
+            /**
+            FROM: inquirer (node module)
+
+            type: (String) Type of the prompt. Defaults: input - Possible values: input, confirm, list, rawlist, password
+            name: (String) The name to use when storing the answer in the answers hash.
+            message: (String|Function) The question to print. If defined as a function, the first parameter will be the current inquirer session answers.
+            default: (String|Number|Array|Function) Default value(s) to use if nothing is entered, or a function that returns the default value(s). If defined as a function, the first parameter will be the current inquirer session answers.
+            choices: (Array|Function) Choices array or a function returning a choices array. If defined as a function, the first parameter will be the current inquirer session answers.
+            Array values can be simple strings, or objects containing a name (to display) and a value properties (to save in the answers hash). Values can also be a Separator.
+            validate: (Function) Receive the user input and should return true if the value is valid, and an error message (String) otherwise. If false is returned, a default error message is provided.
+            filter: (Function) Receive the user input and return the filtered value to be used inside the program. The value returned will be added to the Answers hash.
+            when: (Function, Boolean) Receive the current user answers hash and should return true or false depending on whether or not this question should be asked. The value can also be a simple boolean.
+             */
+
+            var set1 = [];
+            set1.push({
+                type: 'input',  // input, confirm, list, rawlist, password
+                name: 'name',
+                label: 'name',
+                message: 'Qual o seu nome?',
+                default: 'Jerry',
+            });
+            set1.push({
+                type: 'list',
+                name: 'favouriteChocolate',
+                label: 'chocolate',
+                message: 'Qual o seu chocolate preferido?',
+                default: 'kinder',
+                choices: [
+                    {
+                        label: 'Ferrero',
+                        value: 'ferrero',
+                    },
+                    {
+                        label: 'Kinder Chcolate',
+                        value: 'kinder',
+                    },
+                    {
+                        label: 'Nao é shocolate',
+                        value: 'banana',
+                    }
+                ],
+            });
+            set1.push({
+                type: 'password',
+                name: 'password',
+                label: 'password',
+                message: 'Qual a senha da sua conta bancária?'
+            });
+
+            window.addEventListener('WebComponentsReady', function () {
+
+                var t = document.getElementById('t');
+                t.set('questions', set1);
+
+                var inquirer = document.getElementById('inquirer');
+
+                window.t = t;
+                window.inquirer = inquirer;
+            });
+        </script>
+    </body>
+    </html>

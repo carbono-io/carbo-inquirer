@@ -1,0 +1,30 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="carbo-inquirer-list">
+  
+  <template>
+    <select
+      value="{{ question.answer::change }}">
+      <template
+      is="dom-repeat"
+      items="{{ question.choices }}"
+      as="choice">
+      <option
+        value="{{ choice.value }}">{{ choice.label }}</option>
+      </template>
+    </select>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'carbo-inquirer-list',
+      properties: {
+        question: {
+          type: Object,
+          notify: true,
+        }
+      }
+    });
+  </script>
+
+</dom-module>

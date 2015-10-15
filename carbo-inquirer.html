@@ -1,0 +1,97 @@
+<html><head><meta charset="UTF-8"><!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><link rel="import" href="../polymer/polymer.html">
+<script>Polymer.IronResizableBehavior={properties:{_parentResizable:{type:Object,observer:"_parentResizableChanged"},_notifyingDescendant:{type:Boolean,value:!1}},listeners:{"iron-request-resize-notifications":"_onIronRequestResizeNotifications"},created:function(){this._interestedResizables=[],this._boundNotifyResize=this.notifyResize.bind(this)},attached:function(){this.fire("iron-request-resize-notifications",null,{node:this,bubbles:!0,cancelable:!0}),this._parentResizable||(window.addEventListener("resize",this._boundNotifyResize),this.notifyResize())},detached:function(){this._parentResizable?this._parentResizable.stopResizeNotificationsFor(this):window.removeEventListener("resize",this._boundNotifyResize),this._parentResizable=null},notifyResize:function(){this.isAttached&&(this._interestedResizables.forEach(function(e){this.resizerShouldNotify(e)&&this._notifyDescendant(e)},this),this._fireResize())},assignParentResizable:function(e){this._parentResizable=e},stopResizeNotificationsFor:function(e){var i=this._interestedResizables.indexOf(e);i>-1&&(this._interestedResizables.splice(i,1),this.unlisten(e,"iron-resize","_onDescendantIronResize"))},resizerShouldNotify:function(e){return!0},_onDescendantIronResize:function(e){return this._notifyingDescendant?void e.stopPropagation():void(Polymer.Settings.useShadow||this._fireResize())},_fireResize:function(){this.fire("iron-resize",null,{node:this,bubbles:!1})},_onIronRequestResizeNotifications:function(e){var i=e.path?e.path[0]:e.target;i!==this&&(-1===this._interestedResizables.indexOf(i)&&(this._interestedResizables.push(i),this.listen(i,"iron-resize","_onDescendantIronResize")),i.assignParentResizable(this),this._notifyDescendant(i),e.stopPropagation())},_parentResizableChanged:function(e){e&&window.removeEventListener("resize",this._boundNotifyResize)},_notifyDescendant:function(e){this.isAttached&&(this._notifyingDescendant=!0,e.notifyResize(),this._notifyingDescendant=!1)}};</script>
+
+<script>Polymer.IronSelection=function(e){this.selection=[],this.selectCallback=e},Polymer.IronSelection.prototype={get:function(){return this.multi?this.selection.slice():this.selection[0]},clear:function(e){this.selection.slice().forEach(function(t){(!e||e.indexOf(t)<0)&&this.setItemSelected(t,!1)},this)},isSelected:function(e){return this.selection.indexOf(e)>=0},setItemSelected:function(e,t){if(null!=e){if(t)this.selection.push(e);else{var i=this.selection.indexOf(e);i>=0&&this.selection.splice(i,1)}this.selectCallback&&this.selectCallback(e,t)}},select:function(e){this.multi?this.toggle(e):this.get()!==e&&(this.setItemSelected(this.get(),!1),this.setItemSelected(e,!0))},toggle:function(e){this.setItemSelected(e,!this.isSelected(e))}};</script>
+<script>Polymer.IronSelectableBehavior={properties:{attrForSelected:{type:String,value:null},selected:{type:String,notify:!0},selectedItem:{type:Object,readOnly:!0,notify:!0},activateEvent:{type:String,value:"tap",observer:"_activateEventChanged"},selectable:String,selectedClass:{type:String,value:"iron-selected"},selectedAttribute:{type:String,value:null},_excludedLocalNames:{type:Object,value:function(){return{template:1}}}},observers:["_updateSelected(attrForSelected, selected)"],created:function(){this._bindFilterItem=this._filterItem.bind(this),this._selection=new Polymer.IronSelection(this._applySelection.bind(this)),this.__listeningForActivate=!1},attached:function(){this._observer=this._observeItems(this),this._contentObserver=this._observeContent(this),!this.selectedItem&&this.selected&&this._updateSelected(this.attrForSelected,this.selected),this._addListener(this.activateEvent)},detached:function(){this._observer&&this._observer.disconnect(),this._contentObserver&&this._contentObserver.disconnect(),this._removeListener(this.activateEvent)},get items(){var e=Polymer.dom(this).queryDistributedElements(this.selectable||"*");return Array.prototype.filter.call(e,this._bindFilterItem)},indexOf:function(e){return this.items.indexOf(e)},select:function(e){this.selected=e},selectPrevious:function(){var e=this.items.length,t=(Number(this._valueToIndex(this.selected))-1+e)%e;this.selected=this._indexToValue(t)},selectNext:function(){var e=(Number(this._valueToIndex(this.selected))+1)%this.items.length;this.selected=this._indexToValue(e)},_addListener:function(e){this.isAttached&&!this.__listeningForActivate&&(this.__listeningForActivate=!0,this.listen(this,e,"_activateHandler"))},_removeListener:function(e){this.unlisten(this,e,"_activateHandler"),this.__listeningForActivate=!1},_activateEventChanged:function(e,t){this._removeListener(t),this._addListener(e)},_updateSelected:function(){this._selectSelected(this.selected)},_selectSelected:function(e){this._selection.select(this._valueToItem(this.selected))},_filterItem:function(e){return!this._excludedLocalNames[e.localName]},_valueToItem:function(e){return null==e?null:this.items[this._valueToIndex(e)]},_valueToIndex:function(e){if(!this.attrForSelected)return Number(e);for(var t,i=0;t=this.items[i];i++)if(this._valueForItem(t)==e)return i},_indexToValue:function(e){if(!this.attrForSelected)return e;var t=this.items[e];return t?this._valueForItem(t):void 0},_valueForItem:function(e){return e[this.attrForSelected]||e.getAttribute(this.attrForSelected)},_applySelection:function(e,t){this.selectedClass&&this.toggleClass(this.selectedClass,t,e),this.selectedAttribute&&this.toggleAttribute(this.selectedAttribute,t,e),this._selectionChange(),this.fire("iron-"+(t?"select":"deselect"),{item:e})},_selectionChange:function(){this._setSelectedItem(this._selection.get())},_observeContent:function(e){var t=e.querySelector("content");return t&&t.parentElement===e?this._observeItems(e.domHost):void 0},_observeItems:function(e){var t=new MutationObserver(function(e){this.fire("iron-items-changed",e,{bubbles:!1,cancelable:!1}),null!=this.selected&&this._updateSelected()}.bind(this));return t.observe(e,{childList:!0,subtree:!0}),t},_activateHandler:function(e){for(var t=e.target,i=this.items;t&&t!=this;){var s=i.indexOf(t);if(s>=0){var n=this._indexToValue(s);return void this._itemActivate(n,t)}t=t.parentNode}},_itemActivate:function(e,t){this.fire("iron-activate",{selected:e,item:t},{cancelable:!0}).defaultPrevented||this.select(e)}};</script>
+
+
+
+</head><body><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../iron-pages/">
+
+  <style>:host {display: block;}:host > ::content > :not(.iron-selected) {display: none !important;}</style>
+
+  <template>
+
+    <content></content>
+
+  </template>
+
+</dom-module>
+
+<script>Polymer({is:"iron-pages",behaviors:[Polymer.IronResizableBehavior,Polymer.IronSelectableBehavior],properties:{activateEvent:{type:String,value:null}},observers:["_selectedPageChanged(selected)"],_selectedPageChanged:function(e,a){this.async(this.notifyResize)}});</script>
+<dom-module id="carbo-inquirer-input" assetpath="/">
+  
+  <template>
+    <input type="text" value="{{ question.answer::keyup }}" placeholder="{{ question.label }}">
+  </template>
+
+  <script>Polymer({is:"carbo-inquirer-input",properties:{question:{type:Object,notify:!0}}});</script>
+
+</dom-module><dom-module id="carbo-inquirer-styles" assetpath="/"><template><style>:host {background-color: red;}</style></template></dom-module></div><dom-module id="carbo-inquirer">
+  <style include="carbo-inquirer-styles"></style>
+
+  <template>
+    <div id="wrapper">
+
+    <iron-pages attr-for-selected="question-index" selected="{{ currentQuestionIndex }}">
+
+      <template is="dom-repeat" items="{{ questions }}" as="question">
+
+      
+      <div class="question" question-index$="{{ index }}">
+        <h2>{{ index }}</h2>
+        <h1>{{ question.message }}</h1>
+
+        
+        
+        <carbo-inquirer-input hidden$="[[ isQuestionNotOfType(question, 'input') ]]" question="{{ question }}">
+        </carbo-inquirer-input>
+
+        
+        <div hidden$="[[ isQuestionNotOfType(question, 'list') ]]">
+        <select value="{{ question.answer::change }}">
+          <template is="dom-repeat" items="{{ question.choices }}" as="choice">
+          <option value="{{ choice.value }}">{{ choice.label }}</option>
+          </template>
+        </select>
+        </div>
+
+        
+        <div hidden$="[[ isQuestionNotOfType(question, 'password') ]]">
+        <input type="password" value="{{ question.answer::keyup }}" placholder="{{ question.label }}">
+        </div>
+        
+
+        <button hidden$="{{ isAtFirstQuestion }}" on-tap="gotoPreviousQuestion">
+        previous
+        </button>
+
+        <button hidden$="{{ isAtLastQuestion }}" on-tap="gotoNextQuestion">
+        next
+        </button>
+
+        <button hidden$="{{ !isAtLastQuestion }}" on-tap="submit">
+        submit
+        </button>
+      </div>
+      
+
+      </template>
+
+    </iron-pages>
+    </div>
+  </template>
+
+  <script src="../q/q.js"></script>
+  <script>!function(){"use strict";Polymer({is:"carbo-inquirer",properties:{questions:{type:Array,notify:!0,observer:"_handleQuestionsChange",value:[]},currentQuestionIndex:{type:Number,notify:!0,observer:"_handleCurrentQuestionIndexChange",value:0},isAtLastQuestion:{type:Boolean,notify:!0,value:!1},isAtFirstQuestion:{type:Boolean,notify:!0,value:!0}},prompt:function(e){delete this.defer;var t=Q.defer();return this.defer=t,this.set("questions",e),t.promise},readAnswers:function(){var e=this.get("questions");return e.reduce(function(e,t){return e[t.name]=t.value,e},{})},submit:function(){var e=this.readAnswers();console.log(e)},gotoQuestion:function(e){this.set("currentQuestionIndex",e)},gotoPreviousQuestion:function(){this.get("isAtFirstQuestion")?alert("you are just starting, c'mon!"):this.set("currentQuestionIndex",this.get("currentQuestionIndex")-1)},gotoNextQuestion:function(){this.get("isAtLastQuestion")?alert("you have completed the stuff"):this.set("currentQuestionIndex",this.get("currentQuestionIndex")+1)},isQuestionNotOfType:function(e,t){return e.type!==t},_handleQuestionsChange:function(e,t){},_handleCurrentQuestionIndexChange:function(e,t){var n=this.get("currentQuestionIndex"),s=0===n,i=n===this.questions.length-1;this.set("isAtFirstQuestion",s),this.set("isAtLastQuestion",i)}})}();</script>
+
+</dom-module>
+</body></html>

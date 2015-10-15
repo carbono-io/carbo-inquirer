@@ -1,0 +1,82 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+
+<!-- question-elements -->
+<link rel="import" href="carbo-inquirer-input.html">
+<link rel="import" href="carbo-inquirer-list.html">
+<link rel="import" href="carbo-inquirer-password.html">
+
+<link href="carbo-inquirer-styles.html" rel="import">
+
+<dom-module id="carbo-inquirer">
+  <style include="carbo-inquirer-styles"></style>
+
+  <template>
+    <div id="wrapper">
+
+    <iron-pages
+      attr-for-selected="question-index"
+      selected="{{ currentQuestionIndex }}">
+
+      <template
+      is="dom-repeat"
+      items="{{ questions }}"
+      as="question">
+
+      <!-- question start -->
+      <div
+        class="question"
+        question-index$="{{ index }}">
+        <h2>{{ index }}</h2>
+        <h1>{{ question.message }}</h1>
+
+        <!-- question inputs -->
+        <!-- simple input -->
+        <carbo-inquirer-input
+          hidden$="[[ isQuestionNotOfType(question, 'input') ]]"
+          question="{{ question }}">
+        </carbo-inquirer-input>
+
+        <!-- list -->
+        <carbo-inquirer-list
+          hidden$="[[ isQuestionNotOfType(question, 'list') ]]"
+          question="{{ question }}">
+        </carbo-inquirer-list>
+
+        <!-- password -->
+        <carbo-inquirer-password
+          hidden$="[[ isQuestionNotOfType(question, 'password') ]]"
+          question="{{ question }}">
+        </carbo-inquirer-password>
+        <!-- question inputs -->
+
+        <button
+          hidden$="{{ isAtFirstQuestion }}"
+          on-tap="gotoPreviousQuestion">
+          previous
+        </button>
+
+        <button
+          hidden$="{{ isAtLastQuestion }}"
+          on-tap="gotoNextQuestion">
+          next
+        </button>
+
+        <button
+        hidden$="{{ !isAtLastQuestion }}"
+        on-tap="submit">
+        submit
+        </button>
+      </div>
+      <!-- question end -->
+
+      </template>
+
+    </iron-pages>
+    </div>
+  </template>
+
+  <script src="../q/q.js"></script>
+  <script src="carbo-inquirer.js"></script>
+
+</dom-module>
