@@ -118,6 +118,9 @@
             label: 'name',
             message: 'Qual o seu nome?',
             default: 'Jerry',
+            validate: function (answer, answers) {
+                return false;
+            },
         });
 
         set1.push({
@@ -141,13 +144,45 @@
                     value: 'banana',
                 }
             ],
+            validate: function (answer, answers) {
+
+            },
+
+            when: function (answers) {
+
+                console.log('qweqwekjeqw')
+                console.log(answers);
+
+                return answers.password;
+            }
+        });
+
+        set1.push({
+            type: 'input',
+            name: 'login',
+            label: 'Login',
+            message: 'Qual a sua conta bancária?',
+            validate: function (answer, answers) {
+
+            },
+
+            when: function (answers) {
+                return true;
+            }
         });
 
         set1.push({
             type: 'password',
             name: 'password',
             label: 'password',
-            message: 'Qual a senha da sua conta bancária?'
+            message: 'Qual a senha da sua conta bancária?',
+            validate: function (answer, answers) {
+
+            },
+
+            when: function (answers) {
+                return true;
+            }
         });
 
         window.addEventListener('WebComponentsReady', function () {

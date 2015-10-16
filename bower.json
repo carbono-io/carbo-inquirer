@@ -12,6 +12,7 @@
   ],
   "dependencies": {
     "iron-pages": "PolymerElements/iron-pages#~1.0.3",
+    "lodash": "~3.10.1",
     "paper-dialog-behavior": "PolymerElements/paper-dialog-behavior#~1.0.6",
     "polymer": "~1.1.3",
     "q": "1.4.1"
