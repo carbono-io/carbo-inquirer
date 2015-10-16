@@ -154,6 +154,10 @@ var vulcanizePipe = lazypipe()
         excludes: [
             // Exclude polymer, as it is a common dependency
             path.join(TMP_DIR, '/polymer/polymer.html'),
+            path.join(TMP_DIR, '/iron-pages/iron-pages.html'),
+            path.join(TMP_DIR, '/paper-dialog-behavior/paper-dialog-behavior.html'),
+            path.join(TMP_DIR, '/paper-dialog-behavior/paper-dialog-common.css'),
+            path.join(TMP_DIR, '/lodash/lodash.js'),
             path.join(TMP_DIR, '/q/q.js'),
         ],
         inlineScripts: true,
