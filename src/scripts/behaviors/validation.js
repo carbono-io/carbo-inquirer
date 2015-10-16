@@ -9,12 +9,23 @@ var aux = require('../auxiliary');
 exports.properties = {
     /**
      * Validation of the current question
-     * @type {Object}
+     * @type {Boolean}
      */
-    currentQuestionValidation: {
-        type: Object,
+    currentQuestionIsValid: {
+        type: Boolean,
         notify: true,
+
+        value: true,
     },
+
+    /**
+     * Validation error message of the current question
+     * @type {String}
+     */
+    currentQuestionErrorMessage: {
+        type: String,
+        notify: true,
+    }
 };
 
 /**
@@ -22,65 +33,69 @@ exports.properties = {
  */
 exports.validateCurrent = function () {
 
-    var currentQuestionIndex = this.get('currentQuestionIndex');
-    var currentQuestion      = this.get('questions')[currentQuestionIndex];
+    var qIndex   = this.get('currentQuestionIndex');
+    var question = this.get('questions')[qIndex];
 
-    var validationPromise = _validateAnswer.call(this, currentQuestion);
-
-    validationPromise.then(function (validation) {
-
-        // set validation values onto the current question
-        _.each(validation, function (value, key) {
-            aux.setQuestionValue.call(this, currentQuestionIndex, key, value);
-        }.bind(this));
-
-        // set values onto the inquirer scope
-        this.set('currentQuestionValidation', validation);
-
-        // fire corresponding events
-        // if (!validation.isValid) {
-
-        //     this.set('currentQuestionValidation')
-
-        //     this.fire('question-invalid', {
-        //         questionIndex: currentQuestionIndex,
-        //         question: currentQuestion,
-        //         errorMessage: validation.errorMessage,
-        //     });
-        // }
-
-    }.bind(this));
-
-    return validationPromise;
+    return this.validateQuestion(question);
 };
-
-/**
- * Auxiliary functions
- */
 
 /**
  * Validates a question answer
  * @param  {QuestionObject} question that needs validation
  */
-function _validateAnswer(question) {
+exports.validateQuestion = function(question) {
+
+    // deferred object
+    var defer = Q.defer();
+
+    // the answers
+    var qIndex  = this.get('questions').indexOf(question);
     var answer  = question.answer;
     var answers = this.answers;
 
-    // object containing the validation results
-    var validation = {
-        isValid: true,
-    };
-
-    if (typeof question.validate === 'function') {
-        return Q.when(question.validate(answer, answers)).then(function (errorMessage) {
-            if (errorMessage) {
-                validation.isValid = false;
-                validation.errorMessage = errorMessage;
-            }
-
-            return validation;
-        });
+    if (typeof question.validate !== 'function') {
+        // resolve defer immediately
+        defer.resolve();
     } else {
-        return Q(validation);
+
+        // otherwise, execute the validate method of the question object
+        // and wrap the response in a promise wrapper (Q.when)
+        // so that validations may be synchronous or asynchronous
+        Q.when(question.validate(answer, answers))
+        .then(function (errorMessage) {
+
+            if (!errorMessage) {
+                // valid
+                // set validation values onto the current question
+                aux.setQuestionValue.call(this, qIndex, 'isValid', true);
+
+                // if validated question is the current one,
+                // set currentQuestionIsValid
+                if (qIndex === this.get('currentQuestionIndex')) {
+                    this.set('currentQuestionIsValid', true);
+                    this.set('currentQuestionErrorMessage', false);
+                }
+
+                defer.resolve();
+            } else {
+                // invalid
+                aux.setQuestionValue.call(this, qIndex, 'isValid', false);
+                aux.setQuestionValue.call(this, qIndex, 'errorMessage', errorMessage);
+
+                // if validated question is the current one,
+                // set currentQuestionIsValid
+                if (qIndex === this.get('currentQuestionIndex')) {
+                    this.set('currentQuestionIsValid', false);
+                    this.set('currentQuestionErrorMessage', errorMessage);
+                }
+
+                // reject the validation defer
+                defer.reject(errorMessage);
+            }
+        }.bind(this))
+        .done();
     }
-}
+
+    // return promise
+    return defer.promise;
+};

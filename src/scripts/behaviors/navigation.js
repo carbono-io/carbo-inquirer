@@ -89,23 +89,20 @@ exports.next = function () {
         return;
     }
 
-    // not the last, go on!
-    var question = _getCurrentQuestion.call(this);
-    
-    // validate
-    this.validateCurrent()
-        .then(function (validation) {
-            if (validation.isValid) {    
+    var qIndex   = this.get('currentQuestionIndex');
+    var question = this.get('questions')[qIndex];
 
-                // get the next question
-                var nextIndex = _getNextQuestionIndex.call(this);
+    // validate and go to next question
+    this.validateQuestion(question)
+        .then(function () {
+            // get the next question
+            var nextIndex = _getNextQuestionIndex.call(this);
 
-                _gotoQuestion.call(this, nextIndex);
-            } else {
-                // do nothing
-
-            }
-        }.bind(this));
+            _gotoQuestion.call(this, nextIndex);
+        }.bind(this))
+        .fail(function (errorMessage) {
+            console.warn('validation-error: ' + errorMessage);
+        });
 };
 
 /**
@@ -134,24 +131,6 @@ exports._handleCurrentQuestionIndexChange = function (currentQuestionIndex, last
  */
 function _gotoQuestion(index) {
     this.set('currentQuestionIndex', index);
-}
-
-/**
- * Moves the question index a given delta
- * @param  {Number} delta
- */
-function _deltaQuestion(delta) {
-    this.set('currentQuestionIndex', this.get('currentQuestionIndex') + delta);
-}
-
-/**
- * Retrieves the current question
- * @return {QuestionObject}
- */
-function _getCurrentQuestion() {
-    var qs = this.get('questions');
-
-    return qs[this.get('currentQuestionIndex')];
 }
 
 /**

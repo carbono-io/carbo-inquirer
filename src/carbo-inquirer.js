@@ -7,6 +7,9 @@
 
 // Globals: Q
 
+// auxiliary function
+var aux = require('./scripts/auxiliary');
+
 // Constants
 var QUESTION_DEFAULTS = {
     isValid: true,
@@ -120,23 +123,10 @@ var InquirerComponent = Polymer({
 // define some properties
 Object.defineProperty(InquirerComponent.prototype, 'answers', {
     get: function () {
-        return _readAnswers.call(this);
+        return aux.readAnswers.call(this);
     },
     
     set: function () {
         throw new Error('not settable answers')
     }
 });
-
-/**
- * Reads the answers
- * @return {Object} Object keyed by 'question.name' and valued by 'question.answer'
- */
-function _readAnswers() {
-    var questions = this.get('questions');
-    return questions.reduce(function (answers, question) {
-        answers[question.name] = question.answer;
-
-        return answers;
-    }, {});
-}
