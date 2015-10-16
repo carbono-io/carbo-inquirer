@@ -110,13 +110,16 @@ exports.next = function () {
  */
 exports._handleCurrentQuestionIndexChange = function (currentQuestionIndex, lastQuestionIndex) {
 
-    // var isFirst = true;
-    // var isLast  = false;
+    var isFirst = false;
+    var isLast  = false;
 
     if (this.questions) {
         var isFirst = _isFirstQuestion.call(this);
         var isLast  = _isLastQuestion.call(this);
     }
+
+    console.log('isFirst %s', isFirst);
+    console.log('isLast %s', isLast);
 
     this.set('isAtFirstQuestion', isFirst);
     this.set('isAtLastQuestion', isLast);
@@ -193,12 +196,14 @@ function _getPreviousQuestionIndex(fromIndex) {
  * Checks if there are next questions that should be presented
  */
 function _isLastQuestion() {
-    return _getNextQuestionIndex.call(this) === -1;
+    var next = _getNextQuestionIndex.call(this);
+    return next === -1;
 }
 
 /**
  * Checks if there are previous questions that should be presented
  */
 function _isFirstQuestion() {
-    return _getPreviousQuestionIndex.call(this) === -1;
+    var prev = _getPreviousQuestionIndex.call(this);
+    return prev === -1;
 }

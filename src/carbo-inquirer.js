@@ -53,16 +53,18 @@ var InquirerComponent = Polymer({
 
         var defer = Q.defer();
 
-        // open modal, from PaperDialogBehavior
-        this.open();
-
         // save reference to the defer object
         this.defer = defer;
 
-        // set questions
-        if (questions) {
-            this.set('questions', questions);
+        if (!questions) {
+            throw new Error('Questions required');
         }
+
+        // set questions
+        this.set('questions', questions);
+
+        // open modal, from PaperDialogBehavior
+        this.open();
 
         // return promise
         return defer.promise;
@@ -74,12 +76,13 @@ var InquirerComponent = Polymer({
     reset: function () {
         // delete the defer
         delete this.defer;
+
+        // reset currentQuestionIndex
+        // do this before reseting the questions object
+        this.set('currentQuestionIndex', 0);
         
         // set questions to empty array
         this.set('questions', []);
-
-        // reset currentQuestionIndex
-        this.set('currentQuestionIndex', 0);
     },
 
     /**
@@ -90,6 +93,9 @@ var InquirerComponent = Polymer({
         if (this.defer) {
             this.defer.resolve(this.answers);
         }
+
+        // reset
+        this.reset();
 
         // close modal, from PaperDialogBehavior
         this.close();
