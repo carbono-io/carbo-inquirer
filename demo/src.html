@@ -75,9 +75,7 @@
         <button autofocus id="ask" on-tap="inquire">ask!</button>
 
         <!-- inquirer element -->
-        <carbo-inquirer
-            id="inquirer"
-            questions="{{ questions }}">
+        <carbo-inquirer id="inquirer">
         </carbo-inquirer>
 
         <div id="dev">
@@ -110,9 +108,9 @@
 
     <script>
 
-        var set1 = [];
+        var questionSet = [];
 
-        set1.push({
+        questionSet.push({
             type: 'input',  // input, confirm, list, rawlist, password
             name: 'name',
             label: 'name',
@@ -126,7 +124,7 @@
             },
         });
 
-        set1.push({
+        questionSet.push({
             type: 'list',
             name: 'favouriteChocolate',
             label: 'chocolate',
@@ -160,7 +158,7 @@
             }
         });
 
-        set1.push({
+        questionSet.push({
             type: 'input',
             name: 'login',
             label: 'Login',
@@ -174,7 +172,7 @@
             }
         });
 
-        set1.push({
+        questionSet.push({
             type: 'password',
             name: 'password',
             label: 'password',
@@ -197,10 +195,9 @@
             var answersEl = document.getElementById('answers');
 
             // set values onto scope
-            t.set('questions', set1);
             t.inquire = function () {
                 inquirer
-                    .prompt()
+                    .prompt(questionSet)
                     .then(function (answers) {
                         answersEl.innerHTML = JSON.stringify(answers, null, '\t');
 

@@ -14,6 +14,7 @@ var QUESTION_DEFAULTS = {
 
 // Load behaviors
 var NavigationBehavior = require('./scripts/behaviors/navigation');
+var DialogBehavior     = require('./scripts/behaviors/dialog');
 
 /**
  * The format of a 'question' object is as follows:
@@ -26,27 +27,14 @@ var InquirerComponent = Polymer({
 
     behaviors: [
         Polymer.PaperDialogBehavior,
-        NavigationBehavior
+        NavigationBehavior,
+        DialogBehavior
     ],
 
-    properties: {
-        /**
-         * Array of questions to be asked.
-         * @type {Object}
-         */
-        questions: {
-            type: Array,
-            notify: true,
-            observer: '_handleQuestionsChange',
-
-            value: [],
-        },
-    },
-
-    listeners: {
-        'iron-overlay-closed': '_handleOverlayClosed',
-    },
-
+    observers: [
+        // do stuff whenever the questions array is changed
+        '_handleQuestionsChange(questions)'
+    ],
     /**
      * Prompts the user
      * open the modal
@@ -56,8 +44,6 @@ var InquirerComponent = Polymer({
      * @return {Promise -> Answers}        Object containing the answers
      */
     prompt: function (questions) {
-        // cleanup
-        this.reset();
 
         var defer = Q.defer();
 
@@ -77,30 +63,14 @@ var InquirerComponent = Polymer({
     },
 
     /**
-     * Reads the answers
-     * @return {Object} Object keyed by 'question.name' and valued by 'question.answer'
-     */
-    readAnswers: function () {
-        var questions = this.get('questions');
-        return questions.reduce(function (answers, question) {
-            answers[question.name] = question.answer;
-
-            return answers;
-        }, {});
-    },
-
-    /**
      * Resets the inquirer
      */
     reset: function () {
         // delete the defer
         delete this.defer;
         
-        // reset answers
-        var questions = this.get('questions');
-        questions.forEach(function (question, index) {
-            this.set('questions.' + index + '.answer', question.default);
-        }.bind(this));
+        // set questions to empty array
+        this.set('questions', []);
 
         // reset currentQuestionIndex
         this.set('currentQuestionIndex', 0);
@@ -112,8 +82,7 @@ var InquirerComponent = Polymer({
     submit: function () {
         // solve the deferred object
         if (this.defer) {
-            var answers = this.readAnswers();
-            this.defer.resolve(answers);
+            this.defer.resolve(this.answers);
         }
 
         // close modal, from PaperDialogBehavior
@@ -132,37 +101,41 @@ var InquirerComponent = Polymer({
     // Event handlers
     
     /**
-     * Whenever the questions array changes, we must notify the
-     * 'currentQuestionIndex', so that the 'iron-pages' component updates itself
+     * Reset defaults
      */
     _handleQuestionsChange: function (questions, oldQuestions) {
         // set default question values
-        _.each(questions, function (question) {
+        questions.forEach(function (question) {
             _.defaults(question, QUESTION_DEFAULTS);
+
+            // set default answer
+            question.answer = question.default;
         });
-    },
-
-    /**
-     * Deals with the close event of the dialog.
-     * If it was canceled, reject the deferred object
-     */
-    _handleOverlayClosed: function (event) {
-        // this.canceled is from PaperDialogBehavior
-        if (this.canceled && this.defer) {
-            this.defer.reject();
-        }
-
-        // reset after everything is done
-        this.reset();
     },
 });
 
 // define some properties
 Object.defineProperty(InquirerComponent.prototype, 'answers', {
     get: function () {
-        return this.readAnswers();
+        return _readAnswers.call(this);
     },
+    
     set: function () {
         throw new Error('not settable answers')
     }
 });
+
+
+
+/**
+ * Reads the answers
+ * @return {Object} Object keyed by 'question.name' and valued by 'question.answer'
+ */
+function _readAnswers() {
+    var questions = this.get('questions');
+    return questions.reduce(function (answers, question) {
+        answers[question.name] = question.answer;
+
+        return answers;
+    }, {});
+}

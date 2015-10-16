@@ -191,7 +191,7 @@ function _getCurrentQuestion() {
  */
 function _validateAnswer(question) {
     var answer  = question.answer;
-    var answers = this.readAnswers();
+    var answers = this.answers;
 
     // object containing the validation results
     var validation = {
@@ -218,7 +218,7 @@ function _validateAnswer(question) {
  * @return {Boolean}          [description]
  */
 function _isQuestionNeeded(question) {
-    var answers = this.readAnswers();
+    var answers = this.answers;
     var needed = true;
 
     if (typeof question.when === 'function') {
