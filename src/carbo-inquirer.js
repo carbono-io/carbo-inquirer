@@ -90,9 +90,7 @@ var InquirerComponent = Polymer({
     reset: function () {
         // delete the defer
         delete this.defer;
-
-        console.log('reset');
-
+        
         // reset answers
         var questions = this.get('questions');
         questions.forEach(function (question, index) {
@@ -116,21 +114,6 @@ var InquirerComponent = Polymer({
         // close modal, from PaperDialogBehavior
         this.close();
     },
-
-    /**
-     * Cancels the inquirer
-     */
-    // cancel: function () {
-    //     if (this.defer) {
-    //         this.defer.reject();
-    //     }
-
-    //     // reset
-    //     this.reset();
-
-    //     // close modal, from PaperDialogBehavior
-    //     Polymer.PaperDialogBehavior.cancel.call(this);
-    // },
 
     // Auxiliary functions
     /**

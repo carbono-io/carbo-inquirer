@@ -42,15 +42,21 @@ exports.properties = {
 exports.ready = function () {
     // Auxiliary object for navigation within fields
     this.navigator = {
-        previousQuestion: this.previousQuestion.bind(this),
-        nextQuestion: this.nextQuestion.bind(this)
+        prev
+        ious: this.
+        previous.bind(this),
+        next: this.next.bind(this)
     };
 };
 
 /**
  * Question navigation
  */
-exports.previousQuestion = function () {
+
+/**
+ * Navigates to the previous question
+ */
+exports.previous = function () {
 
     if (this.get('isAtFirstQuestion')) {
         console.warn('carbo-inquirer already at first question');
@@ -63,7 +69,10 @@ exports.previousQuestion = function () {
     _gotoQuestion.call(this, previousIndex);
 };
 
-exports.nextQuestion = function () {
+/**
+ * Navigates to the next question
+ */
+exports.next = function () {
 
     if (this.get('isAtLastQuestion')) {
         console.warn('carbo-inquirer already at last question');
@@ -75,7 +84,7 @@ exports.nextQuestion = function () {
     var question = _getCurrentQuestion.call(this);
     
     // validate
-    _validateAnswer.call(this, question)
+    this.validateCurrent()
         .then(function (validation) {
             if (validation.valid) {    
 
@@ -90,19 +99,23 @@ exports.nextQuestion = function () {
 };
 
 /**
+ * Validates the current question's answers
+ */
+exports.validateCurrent = function () {
+    return _validateAnswer.call(this, _getCurrentQuestion.call(this));
+};
+
+/**
  * Whenever the currentQuestionIndex changes, we must notify the people.
  */
 exports._handleCurrentQuestionIndexChange = function (currentQuestionIndex, lastQuestionIndex) {
 
-    var isFirst = true;
-    var isLast  = false;
+    // var isFirst = true;
+    // var isLast  = false;
 
     if (this.questions) {
-        var current = this.get('currentQuestionIndex');
-        // check if the current question is the first one
-        isFirst = current === 0;
-        // check if the current question is the first one
-        isLast  = (current === this.questions.length - 1);
+        var isFirst = _isFirstQuestion.call(this);
+        var isLast  = _isLastQuestion.call(this);
     }
 
     this.set('isAtFirstQuestion', isFirst);
@@ -197,7 +210,11 @@ function _getNextQuestionIndex(fromIndex) {
     // look for questions starting fromIndex the next one
     questions = questions.slice(fromIndex + 1, questions.length);
 
-    return fromIndex + 1 + _.findIndex(questions, _isQuestionNeeded.bind(this));
+    // partial index, because it only considers items starting from the
+    // fromIndex
+    var partial = _.findIndex(questions, _isQuestionNeeded.bind(this));
+
+    return (partial === -1) ? -1 : fromIndex + 1 + partial;
 }
 
 /**
@@ -215,4 +232,18 @@ function _getPreviousQuestionIndex(fromIndex) {
     var questions = this.get('questions').slice(0, fromIndex);
 
     return _.findLastIndex(questions, _isQuestionNeeded.bind(this));
+}
+
+/**
+ * Checks if there are next questions that should be presented
+ */
+function _isLastQuestion() {
+    return _getNextQuestionIndex.call(this) === -1;
+}
+
+/**
+ * Checks if there are previous questions that should be presented
+ */
+function _isFirstQuestion() {
+    return _getPreviousQuestionIndex.call(this) === -1;
 }

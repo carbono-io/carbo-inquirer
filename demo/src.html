@@ -118,8 +118,11 @@
             label: 'name',
             message: 'Qual o seu nome?',
             default: 'Jerry',
-            validate: function (answer, answers) {
-                return false;
+            validate: function (name, answers) {
+
+                if (name === 'Jerry') {
+                    return 'Your name must not be Jerry... c\'mon'
+                }
             },
         });
 
