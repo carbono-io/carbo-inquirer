@@ -14,6 +14,7 @@ var QUESTION_DEFAULTS = {
 
 // Load behaviors
 var NavigationBehavior = require('./scripts/behaviors/navigation');
+var ValidationBehavior = require('./scripts/behaviors/validation');
 var DialogBehavior     = require('./scripts/behaviors/dialog');
 
 /**
@@ -28,6 +29,7 @@ var InquirerComponent = Polymer({
     behaviors: [
         Polymer.PaperDialogBehavior,
         NavigationBehavior,
+        ValidationBehavior,
         DialogBehavior
     ],
 
@@ -35,6 +37,7 @@ var InquirerComponent = Polymer({
         // do stuff whenever the questions array is changed
         '_handleQuestionsChange(questions)'
     ],
+
     /**
      * Prompts the user
      * open the modal
@@ -124,8 +127,6 @@ Object.defineProperty(InquirerComponent.prototype, 'answers', {
         throw new Error('not settable answers')
     }
 });
-
-
 
 /**
  * Reads the answers
