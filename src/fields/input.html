@@ -8,6 +8,11 @@
       value="{{ question.answer::keyup }}"
       placeholder="{{ question.label }}">
 
+    <div hidden$="{{ question.isValid }}">
+      <span>error:</span>
+      <span>{{ question.errorMessage }}</span>
+    </div>
+
     <button on-tap="next"></button>
   </template>
 

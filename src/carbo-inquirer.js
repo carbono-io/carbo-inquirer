@@ -7,6 +7,11 @@
 
 // Globals: Q
 
+// Constants
+var QUESTION_DEFAULTS = {
+    isValid: true,
+};
+
 // Load behaviors
 var NavigationBehavior = require('./scripts/behaviors/navigation');
 
@@ -131,7 +136,10 @@ var InquirerComponent = Polymer({
      * 'currentQuestionIndex', so that the 'iron-pages' component updates itself
      */
     _handleQuestionsChange: function (questions, oldQuestions) {
-
+        // set default question values
+        _.each(questions, function (question) {
+            _.defaults(question, QUESTION_DEFAULTS);
+        });
     },
 
     /**

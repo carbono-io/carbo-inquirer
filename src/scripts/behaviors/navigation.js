@@ -16,6 +16,11 @@ exports.properties = {
         value: 0,
     },
 
+    currentQuestionValidation: {
+        type: Object,
+        notify: true,
+    },
+
     /**
      * Whether the inquirer is at the last question
      * @type {Object}
@@ -42,9 +47,7 @@ exports.properties = {
 exports.ready = function () {
     // Auxiliary object for navigation within fields
     this.navigator = {
-        prev
-        ious: this.
-        previous.bind(this),
+        previous: this.previous.bind(this),
         next: this.next.bind(this)
     };
 };
@@ -86,14 +89,15 @@ exports.next = function () {
     // validate
     this.validateCurrent()
         .then(function (validation) {
-            if (validation.valid) {    
+            if (validation.isValid) {    
 
                 // get the next question
                 var nextIndex = _getNextQuestionIndex.call(this);
 
                 _gotoQuestion.call(this, nextIndex);
             } else {
-                alert(validation.errorMessage);
+                // do nothing
+
             }
         }.bind(this));
 };
@@ -102,7 +106,37 @@ exports.next = function () {
  * Validates the current question's answers
  */
 exports.validateCurrent = function () {
-    return _validateAnswer.call(this, _getCurrentQuestion.call(this));
+
+    var currentQuestionIndex = this.get('currentQuestionIndex');
+    var currentQuestion      = this.get('questions')[currentQuestionIndex];
+
+    var validationPromise = _validateAnswer.call(this, currentQuestion);
+
+    validationPromise.then(function (validation) {
+
+        // set validation values onto the current question
+        _.each(validation, function (value, key) {
+            _setQuestionValue.call(this, currentQuestionIndex, key, value);
+        }.bind(this));
+
+        // set values onto the inquirer scope
+        this.set('currentQuestionValidation', validation);
+
+        // fire corresponding events
+        // if (!validation.isValid) {
+
+        //     this.set('currentQuestionValidation')
+
+        //     this.fire('question-invalid', {
+        //         questionIndex: currentQuestionIndex,
+        //         question: currentQuestion,
+        //         errorMessage: validation.errorMessage,
+        //     });
+        // }
+
+    }.bind(this));
+
+    return validationPromise;
 };
 
 /**
@@ -161,13 +195,13 @@ function _validateAnswer(question) {
 
     // object containing the validation results
     var validation = {
-        valid: true,
+        isValid: true,
     };
 
     if (typeof question.validate === 'function') {
         return Q.when(question.validate(answer, answers)).then(function (errorMessage) {
             if (errorMessage) {
-                validation.valid = false;
+                validation.isValid = false;
                 validation.errorMessage = errorMessage;
             }
 
@@ -246,4 +280,15 @@ function _isLastQuestion() {
  */
 function _isFirstQuestion() {
     return _getPreviousQuestionIndex.call(this) === -1;
+}
+
+/**
+ * Sets data onto the question
+ * @param {String} key   
+ * @param {*} value 
+ */
+function _setQuestionValue(questionIndex, key, value) {
+
+    console.log(arguments);
+    this.set('questions.' + questionIndex + '.' + key, value);
 }
