@@ -141,20 +141,18 @@
                     value: 'kinder',
                 },
                 {
-                    label: 'Nao é shocolate',
+                    label: 'Banana',
                     value: 'banana',
                 }
             ],
-            validate: function (answer, answers) {
-
+            validate: function (chocolate, answers) {
+                if (chocolate === 'banana') {
+                    return 'Banana is not a chocolate!';
+                }
             },
 
             when: function (answers) {
-
-                console.log('qweqwekjeqw')
-                console.log(answers);
-
-                return answers.password;
+                return answers.name === 'Jerrya';
             }
         });
 

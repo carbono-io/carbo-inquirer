@@ -6,13 +6,19 @@
     <select
       value="{{ question.answer::change }}">
       <template
-      is="dom-repeat"
-      items="{{ question.choices }}"
-      as="choice">
-      <option
-        value="{{ choice.value }}">{{ choice.label }}</option>
-      </template>
+        is="dom-repeat"
+        items="{{ question.choices }}"
+        as="choice">
+        <option
+          value="{{ choice.value }}">{{ choice.label }}</option>
+        </template>
     </select>
+
+    <div hidden$="{{ question.isValid }}">
+      <span>error:</span>
+      <span>{{ question.errorMessage }}</span>
+    </div>
+
   </template>
 
   <script>
